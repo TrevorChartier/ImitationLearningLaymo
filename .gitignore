@@ -1,1 +1,3 @@
-imitation_learning_venv/
+*venv/
+data/
+src/__pycache__/

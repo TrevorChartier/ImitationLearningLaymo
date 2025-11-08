@@ -31,13 +31,15 @@ def get_data_dir() -> str:
     return str(full_data_dir)
 
 def print_instructions():
-    print("Welcome to Laymo RC Data Collection!")
+    print("\n\nWelcome to Laymo RC Data Collection!")
     print("During your run, press the 'a' key to go left and the 'd' key to go right")
     print("Stop the car and data collection at any point by pressing 's'")
     
     ready = False
     while not ready:
         ready = input("Press 'r' to begin the run.") == 'r'
+        
+    print("Beginning Run")
 
 if __name__ == "__main__":
     # PCA9685 pins
@@ -50,8 +52,8 @@ if __name__ == "__main__":
     data_collector = DataCollector(laymo, cam, get_data_dir())
 
     # Set signal handlers in case of ^C or program failure, car stops
-    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
-        signal.signal(sig, data_collector.force_stop)
+    # for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+    #     signal.signal(sig, data_collector.force_stop)
 
     print_instructions()
     time.sleep(0.5)

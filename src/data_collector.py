@@ -12,6 +12,7 @@ import keyboard
 from laymo.car import Car
 from laymo.camera_manager import CameraManager
 
+from input_handler import InputHandler
 
 class DataCollector:
     def __init__(self, car, camera, data_dir):
@@ -27,21 +28,32 @@ class DataCollector:
         self.__setup_data_dir()
 
     def run(self):
-        """Begin the RC Control and Data Log Loop"""
-        while not self.__stop_flag:
-            self.__set_car_speed()
-            self.__car.set_steering(self.__steering_cmd)
+        """Main control and data collection loop."""
+        input_handler = InputHandler()
+        try:
+            while not self.__stop_flag:
+                self.__set_car_speed()
+                self.__car.set_steering(self.__steering_cmd)
+                print(self.__steering_cmd)
 
-            if keyboard.is_pressed("s"):
-                self.force_stop()
+                key = input_handler.get_key()
+                if key == "w":
+                    self.force_stop()
+                elif key == "a":
+                    self.__steering_cmd = max(-1, self.__steering_cmd - 0.1)
+                elif key == "d":
+                    self.__steering_cmd = min(1, self.__steering_cmd + 0.1)
+                elif key =="s":
+                    self.__steering_cmd = self.__shrink_toward_zero(self.__steering_cmd)
 
-            self.__update_steering_from_input()
-            self.__log_data()
-            self.__iteration += 1
-            
-        self.__car.set_speed(0)
+                self.__log_data()
+                self.__iteration += 1
+        finally:
+            input_handler.restore()
+            self.__car.set_speed(0)
 
-    def force_stop(self):
+
+    def force_stop(self, signum=None, frame=None):
         """Stop the car by setting flag. Useful for signal handlers."""
         self.__stop_flag = True
 
@@ -53,7 +65,7 @@ class DataCollector:
         with open(self.__labels_path, "a", encoding="utf-8") as f:
             f.write("timestamp, steering_command\n")
 
-    def __shrink_toward_zero(self, val, step=0.2):
+    def __shrink_toward_zero(self, val, step=0.05):
         """Brings val closer to zero by step (default 0.2)."""
         if abs(val) <= step:
             return 0
@@ -61,16 +73,7 @@ class DataCollector:
 
     def __set_car_speed(self):
         """Manually pulses the throttle on and off."""
-        self.__car.set_speed(0.23 if self.__iteration % 3 == 0 else 0.0)
-
-    def __update_steering_from_input(self):
-        """Uses the non-blocking keyboard input to update the current steering value."""
-        if keyboard.is_pressed("a"):
-            self.__steering_cmd = max(-1, self.__steering_cmd - 0.2)
-        elif keyboard.is_pressed("d"):
-            self.__steering_cmd = min(1, self.__steering_cmd + 0.2)
-        else:
-            self.__steering_cmd = self.__shrink_toward_zero(self.__steering_cmd)
+        self.__car.set_speed(0.23 if self.__iteration//10 % 3 == 0 else 0.0)
 
     def __log_data(self):
         """Write the current camera frame and steering command."""
