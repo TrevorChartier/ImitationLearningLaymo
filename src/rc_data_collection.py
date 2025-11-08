@@ -52,8 +52,8 @@ if __name__ == "__main__":
     data_collector = DataCollector(laymo, cam, get_data_dir())
 
     # Set signal handlers in case of ^C or program failure, car stops
-    # for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
-    #     signal.signal(sig, data_collector.force_stop)
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        signal.signal(sig, data_collector.force_stop)
 
     print_instructions()
     time.sleep(0.5)
