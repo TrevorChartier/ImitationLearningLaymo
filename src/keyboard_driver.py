@@ -1,0 +1,55 @@
+import time
+import cv2
+import os
+
+from input_handler import InputHandler
+from base_driver import BaseDriver
+
+class KeyboardDriver(BaseDriver):
+    def __init__(self, car, camera, data_dir):
+        super().__init__(car, camera)
+        self.__data_dir = data_dir
+        self.__labels_path = os.path.join(self.__data_dir, "labels.csv")
+        self.__img_path = os.path.join(self.__data_dir, "images")
+        self.__setup_data_dir()
+        self.__input_handler = InputHandler()
+        
+    def __get_steering(self):
+        key = self.__input_handler.get_key()
+        if key == "w":
+            self.force_stop()
+        elif key == "a":
+            self.__steering_cmd = max(-1, self.__steering_cmd - 0.1)
+        elif key == "d":
+            self.__steering_cmd = min(1, self.__steering_cmd + 0.1)
+        elif key =="s":
+            self.__steering_cmd = self.__shrink_toward_zero(self.__steering_cmd)
+
+    def __shrink_toward_zero(self, val, step=0.05):
+        """Brings val closer to zero by step (default 0.2)."""
+        if abs(val) <= step:
+            return 0
+        return val - step if val > 0 else val + step
+
+    def __log_data(self):
+        """Write the current camera frame and steering command."""
+        timestamp = int(time.time() * 1000)
+        frame = self.__camera.get_latest_frame()
+        img_filename = f"{timestamp}.jpg"
+        cv2.imwrite(os.path.join(self.__img_path, img_filename), frame)
+        with open(self.__labels_path, "a", encoding="utf-8") as f:
+            f.write(f"{timestamp}, {self.__steering_cmd}\n")
+  
+    def __setup_data_dir(self):
+        """Create empty directory and labels file for data."""
+        print(f"Creating data directory at {self.__data_dir}")
+        os.makedirs(self.__img_path, exist_ok=False)
+
+        with open(self.__labels_path, "a", encoding="utf-8") as f:
+            f.write("timestamp, steering_command\n")
+            
+    def run(self):
+        try:
+            super().run()
+        finally:
+            self.__input_handler.restore()

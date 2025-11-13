@@ -20,7 +20,7 @@ import time
 
 from laymo.car import Car
 from laymo.camera_manager import CameraManager
-from data_collector import DataCollector
+from keyboard_driver import KeyboardDriver
 
 
 def get_data_dir() -> str:
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # Initialize the car and camera manager
     laymo = Car(STEERING_PIN, THROTTLE_PIN)
     cam = CameraManager()
-    data_collector = DataCollector(laymo, cam, get_data_dir())
+    data_collector = KeyboardDriver(laymo, cam, get_data_dir())
 
     # Set signal handlers in case of ^C or program failure, car stops
     for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
