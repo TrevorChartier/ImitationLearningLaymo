@@ -3,33 +3,38 @@ import time
 
 class BaseDriver(ABC):
     def __init__(self, car, camera):
-        self.__car = car
-        self.__camera = camera
-        self.__stop_flag = False
-        self.__iteration = 0
-        self.__steering_cmd = 0
+        self._car = car
+        self._camera = camera
+        self._stop_flag = False
+        self._iteration = 0
+        self._steering_cmd = 0
+        self._throttle_cmd = 0
         
     def run(self):
         """Begin Driving Control Loop"""
-        while not self.__stop_flag:
+        while not self._stop_flag:
             try:
-                self.__set_car_speed()
-                self.__car.set_steering(self.__steering_cmd)
+                self._set_car_speed()
+                self._car.set_steering(self._steering_cmd)
                 
-                self.__steering_cmd = self.__get_steering()
+                self._steering_cmd = self._get_steering()
+                self._iteration += 1
+                
+                self._log_data()
             finally:
-                self.__car.set_speed(0)
+                self._car.set_speed(0)
                 
     @abstractmethod
-    def __get_steering(self):
+    def _get_steering(self):
         pass
 
-    def __set_car_speed(self):
-        self.__car.set_speed(0.23 if self.__iteration//10 % 3 == 0 else 0.0)
+    def _set_car_speed(self):
+        self._throttle_cmd = (0.23 if self._iteration//10 % 3 == 0 else 0.0)
+        self._car.set_speed(self._throttle_cmd)
 
-    def force_stop(self):
+    def force_stop(self, signum=None, frame=None):
         self._stop_flag = True
 
-    def __log_data(self):
+    def _log_data(self):
         pass  # Optional, override in data collection subclass
             
