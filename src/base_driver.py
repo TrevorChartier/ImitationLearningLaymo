@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
-import time
 
 class BaseDriver(ABC):
+    """
+    Base class for a driving and data logging loop
+    
+    Implementing classes must implement the abstract method _get_steering
+    """
     def __init__(self, car, camera):
         self._car = car
         self._camera = camera
@@ -29,7 +33,8 @@ class BaseDriver(ABC):
         pass
 
     def _set_car_speed(self):
-        self._throttle_cmd = (0.23 if self._iteration//10 % 3 == 0 else 0.0)
+        ON_SPEED = 0 #0.23 is minimum possible that will go forward
+        self._throttle_cmd = (ON_SPEED if self._iteration//10 % 3 == 0 else 0.0)
         self._car.set_speed(self._throttle_cmd)
 
     def force_stop(self, signum=None, frame=None):
