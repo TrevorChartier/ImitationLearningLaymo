@@ -15,7 +15,7 @@ class KeyboardDriver(BaseDriver):
         self._input_handler = InputHandler()
         
     def _get_steering(self):
-        key = self._input_handler.get_key()
+        key, _ = self._input_handler.get_key()
         if key == "w":
             self.force_stop()
         elif key == "a":

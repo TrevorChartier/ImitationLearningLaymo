@@ -11,12 +11,18 @@ class InputHandler:
         self.last_key = None
 
     def get_key(self):
-        """Return the last key pressed, or update it if a new key is pressed."""
-        dr, _, _ = select.select([sys.stdin], [], [], 0)
-        if dr:
+        """
+        Return the last key pressed, or update it if a new key is pressed.
+        Also returns a boolean indicating whether a new key was pressed.
+        """
+        readable, _, _ = select.select([sys.stdin], [], [], 0)
+        if readable:
+            key_pressed = True
             key = sys.stdin.read(1)
             self.last_key = key
-        return self.last_key
+        else:
+            key_pressed = False
+        return self.last_key, key_pressed
 
     def restore(self):
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.orig_settings)
