@@ -1,17 +1,3 @@
-"""This module defines a script to collect data for behavior cloning.
-
-It allows for teleoperation (RC control) of the Laymo car while recording camera frames
-and the associated teleoperation inputs. 
-
-To Use:
-python rc_data_collection.py
-
-Follow the on-screen instructions. 
-Press 'r' to begin (Warning, the car will begin moving at a constant speed)
-Use 'a' to move left and 'd' to move right.
-
-Data is written to folders within the directory data/ at the root of the repo
-"""
 from datetime import datetime
 import signal
 
@@ -20,7 +6,8 @@ import time
 
 from laymo.car import Car
 from laymo.camera_manager import CameraManager
-from keyboard_driver import KeyboardDriver
+from inference_driver import InferenceDriver
+from model import Model
 
 
 def get_data_dir() -> str:
@@ -32,10 +19,11 @@ def get_data_dir() -> str:
     print (str(full_data_dir))
     return str(full_data_dir)
 
-
 def print_instructions():
-    print("\n\nWelcome to Laymo RC Data Collection!")
-    print("During your run, press the 'a' key to go left and the 'd' key to go right")
+    print("\n\nWelcome to Laymo RC Inference Time!")
+    print("Take over at any point using the keyboard")
+    print("Press the 'a' key to go left, the 's' key to go straight and the 'd' key to go right")
+    print("Return control to autonomous mode using the 'f' key")
     print("Stop the car and data collection at any point by pressing 'w'")
     
     ready = False
@@ -52,7 +40,8 @@ if __name__ == "__main__":
     # Initialize the car and camera manager
     laymo = Car(STEERING_PIN, THROTTLE_PIN)
     cam = CameraManager()
-    data_collector = KeyboardDriver(laymo, cam, get_data_dir())
+    model = Model()
+    data_collector = InferenceDriver(laymo, cam, model, get_data_dir())
 
     # Set signal handlers in case of ^C or program failure, car stops
     for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
