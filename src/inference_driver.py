@@ -6,7 +6,6 @@ class InferenceDriver(BaseDriver):
     def __init__(self, car, camera, model):
         super().__init__(car, camera)
         self._model = model
-        self._input_handler = InputHandler() # Can refactor this into base class
         self._expert_override = False
     
     def _get_steering(self):
@@ -24,26 +23,3 @@ class InferenceDriver(BaseDriver):
             
         # If nothing is returned already, policy is in control
         return self._model.predict(False)
-            
-    def _get_keyboard_steering_input(self, key):
-        """ Return a steering command based on a keyboard input """
-        if key == "a":
-            return max(-1, self._steering_cmd - 0.1)
-        elif key == "d":
-            return min(1, self._steering_cmd + 0.1)
-        elif key =="s":
-            return self._shrink_toward_zero(self._steering_cmd)
-        else:
-            return self._steering_cmd
-        
-    def _shrink_toward_zero(self, val, step=0.05):
-        """Brings val closer to zero by step (default 0.2)."""
-        if abs(val) <= step:
-            return 0
-        return val - step if val > 0 else val + step
-    
-    def run(self):
-        try:
-            super().run()
-        finally:
-            self._input_handler.restore()
