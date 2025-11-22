@@ -3,10 +3,14 @@ import cv2
 import os
 
 from base_driver import BaseDriver
+from model import Model
+
+from laymo.car import Car
+from laymo.camera_manager import CameraManager
 
 # Probably want to capture camera frame once and store as instance variable
 class InferenceDriver(BaseDriver):
-    def __init__(self, car, camera, model, data_dir):
+    def __init__(self, car: Car, camera: CameraManager, model: Model, data_dir: str):
         super().__init__(car, camera, data_dir)
         self._model = model
         self._expert_override = False
@@ -18,7 +22,7 @@ class InferenceDriver(BaseDriver):
         }
         self._setup_policy_data_dir()
     
-    def _get_steering(self):
+    def _get_steering(self) -> float:
         key, new_press = self._input_handler.get_key()
         if new_press or self._expert_override:
             # Expert is in control

@@ -4,13 +4,16 @@ import cv2
 import time
 from input_handler import InputHandler
 
+from laymo.car import Car
+from laymo.camera_manager import CameraManager
+
 class BaseDriver(ABC):
     """
     Base class for a driving and data logging loop
     
     Implementing classes must implement the abstract method _get_steering
     """
-    def __init__(self, car, camera, data_dir):
+    def __init__(self, car: Car, camera: CameraManager, data_dir: str):
         self._car = car
         self._camera = camera
         self._stop_flag = False
@@ -45,10 +48,10 @@ class BaseDriver(ABC):
             self._car.set_speed(0)
                      
     @abstractmethod
-    def _get_steering(self):
+    def _get_steering(self) -> float:
         pass
     
-    def _get_keyboard_steering_input(self, key):
+    def _get_keyboard_steering_input(self, key: str) -> float:
         """ Return a steering command based on a keyboard input """
         if key == "a":
             return max(-1, self._steering_cmd - 0.1)
@@ -59,7 +62,7 @@ class BaseDriver(ABC):
         else:
             return self._steering_cmd
         
-    def _shrink_toward_zero(self, val, step=0.05):
+    def _shrink_toward_zero(self, val: float, step=0.05) -> float:
         """Brings val closer to zero by step (default 0.2)."""
         if abs(val) <= step:
             return 0
@@ -73,7 +76,7 @@ class BaseDriver(ABC):
     def force_stop(self, signum=None, frame=None):
         self._stop_flag = True
 
-    def _log_data(self, output_paths):
+    def _log_data(self, output_paths: dict):
         """Write the current camera frame and steering command."""
         timestamp = int(time.time() * 1000)
         throttle_on = 1 if self._throttle_cmd > 0 else 0

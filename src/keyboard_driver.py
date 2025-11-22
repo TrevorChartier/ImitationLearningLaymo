@@ -1,14 +1,13 @@
-import time
-import cv2
-import os
+from laymo.car import Car
+from laymo.camera_manager import CameraManager
 
 from base_driver import BaseDriver
 
 class KeyboardDriver(BaseDriver):
-    def __init__(self, car, camera, data_dir):
+    def __init__(self, car: Car, camera: CameraManager, data_dir: str):
         super().__init__(car, camera, data_dir)
 
-    def _get_steering(self):
+    def _get_steering(self) -> float:
         key, _ = self._input_handler.get_key()
         if key == "w":
             self.force_stop()
