@@ -1,12 +1,22 @@
+import time
+import cv2
+import os
+
 from base_driver import BaseDriver
-from input_handler import InputHandler
 
 # Probably want to capture camera frame once and store as instance variable
 class InferenceDriver(BaseDriver):
-    def __init__(self, car, camera, model):
-        super().__init__(car, camera)
+    def __init__(self, car, camera, model, data_dir):
+        super().__init__(car, camera, data_dir)
         self._model = model
         self._expert_override = False
+        
+        policy_dir = os.path.join(data_dir, "policy")
+        self._policy_paths = {
+            "labels": os.path.join(policy_dir, "labels.csv"),
+            "images": os.path.join(policy_dir, "images")
+        }
+        self._setup_policy_data_dir()
     
     def _get_steering(self):
         key, new_press = self._input_handler.get_key()
@@ -23,3 +33,17 @@ class InferenceDriver(BaseDriver):
             
         # If nothing is returned already, policy is in control
         return self._model.predict(False)
+    
+    def _log_data(self):
+        """Write the current camera frame and steering command."""
+        if self._expert_override:
+            output_paths = self._expert_paths
+        else:
+            output_paths = self._policy_paths
+        super()._log_data(output_paths)
+
+    def _setup_policy_data_dir(self):
+        """Create empty directory and labels file for data collected during policy control"""
+        os.makedirs(self._policy_paths["images"], exist_ok=False)
+        with open(self._policy_paths["labels"], "a", encoding="utf-8") as f:
+            f.write("timestamp, throttle_on, steering_command\n")

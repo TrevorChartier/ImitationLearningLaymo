@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+import os
+import cv2
+import time
 from input_handler import InputHandler
 
 class BaseDriver(ABC):
@@ -7,22 +10,29 @@ class BaseDriver(ABC):
     
     Implementing classes must implement the abstract method _get_steering
     """
-    def __init__(self, car, camera):
+    def __init__(self, car, camera, data_dir):
         self._car = car
         self._camera = camera
         self._stop_flag = False
         self._iteration = 0
         self._steering_cmd = 0
         self._throttle_cmd = 0
+        self._input_handler = None # Only initialize this once run is called
+        self._latest_camera_frame = None
         
-        self._input_handler = None
+        expert_dir = os.path.join(data_dir, "expert")
+        self._expert_paths = {
+            "labels": os.path.join(expert_dir, "labels.csv"),
+            "images": os.path.join(expert_dir, "images")
+        }
+        self._setup_data_dir()
         
     def run(self):
         """Begin Driving Control Loop"""
         self._input_handler = InputHandler()
         try:
             while not self._stop_flag:
-                
+                    self._latest_camera_frame = self._camera.get_latest_frame()
                     self._set_car_speed()
                     self._car.set_steering(self._steering_cmd)
                     
@@ -63,6 +73,19 @@ class BaseDriver(ABC):
     def force_stop(self, signum=None, frame=None):
         self._stop_flag = True
 
-    def _log_data(self):
-        pass  # Optional, override in data collection subclass
+    def _log_data(self, output_paths):
+        """Write the current camera frame and steering command."""
+        timestamp = int(time.time() * 1000)
+        throttle_on = 1 if self._throttle_cmd > 0 else 0
+        
+        img_filename = f"{timestamp}.jpg"
+        cv2.imwrite(os.path.join(output_paths["images"], img_filename), self._latest_camera_frame)
+        with open(output_paths["labels"], "a", encoding="utf-8") as f:
+            f.write(f"{timestamp}, {throttle_on}, {self._steering_cmd}\n")
+    
+    def _setup_data_dir(self):
+        """Create empty directory and labels file for data."""
+        os.makedirs(self._expert_paths["images"], exist_ok=False)
+        with open(self._expert_paths["labels"], "a", encoding="utf-8") as f:
+            f.write("timestamp, throttle_on, steering_command\n")
             
