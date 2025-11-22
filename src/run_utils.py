@@ -10,6 +10,7 @@ from laymo.camera_manager import CameraManager
 
 from base_driver import BaseDriver
 
+
 def run_driver(driver_cls: BaseDriver, driver_args: list, instructions_fn: Callable[[], None]):
     # PCA9685 pins
     THROTTLE_PIN = 0
@@ -45,12 +46,14 @@ def print_rc_instructions():
     print("During your run, press the 'a' key to go left and the 'd' key to go right")
     print("Stop the car and data collection at any point by pressing 'w'")
 
+
 def print_inference_instructions():
     print("\n\nWelcome to Laymo RC Inference Time!")
     print("Take over at any point using the keyboard")
     print("Press the 'a' key to go left, the 's' key to go straight and the 'd' key to go right")
     print("Return control to autonomous mode using the 'f' key")
     print("Stop the car and data collection at any point by pressing 'w'")
+
 
 def _await_ready():
     ready = False
