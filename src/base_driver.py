@@ -2,7 +2,10 @@ from abc import ABC, abstractmethod
 import os
 import cv2
 import time
+from collections import deque
+
 from input_handler import InputHandler
+from buffer import Buffer
 
 from laymo.car import Car
 from laymo.camera_manager import CameraManager
@@ -23,6 +26,12 @@ class BaseDriver(ABC):
         self._input_handler = None # Only initialize this once run is called
         self._latest_camera_frame = None
         
+        self._steering_buffer = Buffer(100)
+        
+        self._THROTTLE_STEP_LEN = 10 # How many iterations in a cycle
+        self._THROTTLE_CYCLE = 3 # How many cycles in period. Throttle is on for one of the cycles in period
+        self._THROTTLE_PERIOD = self._THROTTLE_CYCLE * self._THROTTLE_STEP_LEN
+        
         expert_dir = os.path.join(data_dir, "expert")
         self._expert_paths = {
             "labels": os.path.join(expert_dir, "labels.csv"),
@@ -33,6 +42,7 @@ class BaseDriver(ABC):
     def run(self):
         """Begin Driving Control Loop"""
         self._input_handler = InputHandler()
+        start_time = time.time()
         try:
             while not self._stop_flag:
                     self._latest_camera_frame = self._camera.get_latest_frame()
@@ -40,12 +50,14 @@ class BaseDriver(ABC):
                     self._car.set_steering(self._steering_cmd)
                     
                     self._steering_cmd = self._get_steering()
-                    self._iteration += 1
-                    
                     self._log_data()
+                    self._steering_buffer.add(self._steering_cmd)
+                    self._iteration += 1        
         finally:
+            duration = time.time() - start_time
             self._input_handler.restore()
             self._car.set_speed(0)
+            print("Control Frequency: ", round(self._iteration / (duration)), "hz")
                      
     @abstractmethod
     def _get_steering(self) -> float:
@@ -54,11 +66,11 @@ class BaseDriver(ABC):
     def _get_keyboard_steering_input(self, key: str) -> float:
         """ Return a steering command based on a keyboard input """
         if key == "a":
-            return max(-1, self._steering_cmd - 0.1)
+            return -1
         elif key == "d":
-            return min(1, self._steering_cmd + 0.1)
+            return 1
         elif key =="s":
-            return self._shrink_toward_zero(self._steering_cmd)
+            return 0
         else:
             return self._steering_cmd
         
@@ -69,8 +81,8 @@ class BaseDriver(ABC):
         return val - step if val > 0 else val + step
 
     def _set_car_speed(self):
-        ON_SPEED = 0 #0.23 is minimum possible that will go forward
-        self._throttle_cmd = (ON_SPEED if self._iteration//10 % 3 == 0 else 0.0)
+        ON_SPEED = 0.23 #0.23 is minimum possible that will go forward
+        self._throttle_cmd = (ON_SPEED if self._iteration//self._THROTTLE_STEP_LEN % self._THROTTLE_CYCLE == 0 else 0.0)
         self._car.set_speed(self._throttle_cmd)
 
     def force_stop(self, signum=None, frame=None):
@@ -79,16 +91,20 @@ class BaseDriver(ABC):
     def _log_data(self, output_paths: dict):
         """Write the current camera frame and steering command."""
         timestamp = int(time.time() * 1000)
-        throttle_on = 1 if self._throttle_cmd > 0 else 0
+        
+        steering_lookback = self._steering_buffer.get()
+        steering_lookback_str = ";".join(map(str, steering_lookback))
+        
+        throttle_pulse_idx = self._iteration % self._THROTTLE_PERIOD
         
         img_filename = f"{timestamp}.jpg"
         cv2.imwrite(os.path.join(output_paths["images"], img_filename), self._latest_camera_frame)
         with open(output_paths["labels"], "a", encoding="utf-8") as f:
-            f.write(f"{timestamp}, {throttle_on}, {self._steering_cmd}\n")
+            f.write(f"{timestamp}\t{steering_lookback_str}\t{throttle_pulse_idx}\t{self._steering_cmd}\n")
     
     def _setup_data_dir(self):
         """Create empty directory and labels file for data."""
         os.makedirs(self._expert_paths["images"], exist_ok=False)
         with open(self._expert_paths["labels"], "a", encoding="utf-8") as f:
-            f.write("timestamp, throttle_on, steering_command\n")
+            f.write("timestamp\tsteering_lookback\tthrottle_pulse_idx\tsteering_command\n")
             
