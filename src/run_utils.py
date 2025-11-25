@@ -36,8 +36,10 @@ def _get_data_dir(num_model) -> str:
     parent_dir = Path(__file__).parent.parent
     date_dir = datetime.now().strftime("%b_%d_%Y")
     
+    DAgger = ""
     if num_model > 0:
         DAgger = "dagger_" # Trials run with a policy should indicate it in their name
+        
 
     data_dir_name = DAgger + "trial_" + datetime.now().strftime("%I:%M:%S_%p")
     full_data_dir = parent_dir / "data" / "trials" / date_dir / data_dir_name
