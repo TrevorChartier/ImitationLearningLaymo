@@ -28,8 +28,8 @@ class BaseDriver(ABC):
         
         self._steering_buffer = Buffer(100)
         
-        self._THROTTLE_STEP_LEN = 10 # How many iterations in a cycle
-        self._THROTTLE_CYCLE = 3 # How many cycles in period. Throttle is on for one of the cycles in period
+        self._THROTTLE_STEP_LEN = 15 # How many iterations in a cycle
+        self._THROTTLE_CYCLE = 4 # How many cycles in period. Throttle is on for one of the cycles in period
         self._THROTTLE_PERIOD = self._THROTTLE_CYCLE * self._THROTTLE_STEP_LEN
         
         expert_dir = os.path.join(data_dir, "expert")

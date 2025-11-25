@@ -8,8 +8,9 @@ class Buffer:
         self._len = len
           
     def add(self, element: int):
-        self._buffer[self._idx] = element
-        self._idx = (self._idx + 1) % self._len
+        if(element is not None):
+            self._buffer[self._idx] = element
+            self._idx = (self._idx + 1) % self._len
         
     def get(self, stride = 5):
         """Get every element, ordered, with given stride"""
