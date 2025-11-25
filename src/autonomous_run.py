@@ -3,5 +3,6 @@ from inference_driver import InferenceDriver
 from model import Model
 
 if __name__ == "__main__":
-    model = Model("/home/trevorchartier/Projects/ImitationLearningLaymo/model/bc_car_model_pqcat.keras")
+    model_path = "/home/trevorchartier/Projects/ImitationLearningLaymo/models/bc_car_model_pqcat.keras"
+    model = Model(model_path)
     run_driver(InferenceDriver, [model], print_inference_instructions)

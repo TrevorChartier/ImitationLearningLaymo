@@ -11,7 +11,7 @@ from laymo.camera_manager import CameraManager
 from base_driver import BaseDriver
 
 
-def run_driver(driver_cls: BaseDriver, driver_args: list, instructions_fn: Callable[[], None]):
+def run_driver(driver_cls: BaseDriver, model_args: list, instructions_fn: Callable[[], None]):
     # PCA9685 pins
     THROTTLE_PIN = 0
     STEERING_PIN = 1
@@ -20,7 +20,7 @@ def run_driver(driver_cls: BaseDriver, driver_args: list, instructions_fn: Calla
     laymo = Car(STEERING_PIN, THROTTLE_PIN)
     cam = CameraManager()
     
-    driver = driver_cls(laymo, cam, *driver_args, _get_data_dir())
+    driver = driver_cls(laymo, cam, *model_args, _get_data_dir(len(model_args)))
 
     for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
         signal.signal(sig, driver.force_stop)
@@ -31,11 +31,15 @@ def run_driver(driver_cls: BaseDriver, driver_args: list, instructions_fn: Calla
     driver.run()
 
 
-def _get_data_dir() -> str:
+def _get_data_dir(num_model) -> str:
     """Return the directory to the data folder relative to this script"""
     parent_dir = Path(__file__).parent.parent
     date_dir = datetime.now().strftime("%b_%d_%Y")
-    data_dir_name = "trial_" + datetime.now().strftime("%I:%M:%S_%p")
+    
+    if num_model > 0:
+        DAgger = "dagger_" # Trials run with a policy should indicate it in their name
+
+    data_dir_name = DAgger + "trial_" + datetime.now().strftime("%I:%M:%S_%p")
     full_data_dir = parent_dir / "data" / "trials" / date_dir / data_dir_name
     print (str(full_data_dir))
     return str(full_data_dir)

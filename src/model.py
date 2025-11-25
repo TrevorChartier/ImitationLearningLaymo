@@ -1,4 +1,5 @@
 """Wrapper around a ML model steering predictor."""
+import os
 import numpy as np
 from tflite_runtime.interpreter import Interpreter
 from PIL import Image
@@ -6,6 +7,7 @@ from PIL import Image
 class Model:
     """Dummy Policy for Now, later will use ML model to predict"""
     def __init__(self, model_path):
+        self._model_id =  os.path.basename(os.path.dirname(model_path))
         self._interpreter = Interpreter(model_path=model_path)
         self._interpreter.allocate_tensors()
         self._input_details = self._interpreter.get_input_details()
@@ -23,6 +25,9 @@ class Model:
         pred = self._interpreter.get_tensor(self._output_details[0]['index'])
         
         return pred[0][0]
+    
+    def get_info(self):
+        return self._model_id
         
     def _preprocess(self, img: np.ndarray) -> np.ndarray:
         # Scale down from 640 x 480 pixels to 6x smaller.

@@ -17,6 +17,7 @@ class InferenceDriver(BaseDriver):
             "labels": os.path.join(policy_dir, "labels.csv"),
             "images": os.path.join(policy_dir, "images")
         }
+        self._model_info_filepath = os.path.join(data_dir, "model_id.txt")
         self._setup_policy_data_dir()
     
     def _get_steering(self) -> float:
@@ -48,3 +49,6 @@ class InferenceDriver(BaseDriver):
         os.makedirs(self._policy_paths["images"], exist_ok=False)
         with open(self._policy_paths["labels"], "a", encoding="utf-8") as f:
             f.write("timestamp, throttle_on, steering_command\n")
+            
+        with open(self._model_info_filepath, "a", encoding="utf-8") as f:
+            f.write(self._model.get_info())
