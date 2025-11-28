@@ -1,0 +1,1 @@
+Trained on same data as 009 except this one, I randomly horizontally flipped 0.2 of the training data.

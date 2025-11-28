@@ -50,7 +50,8 @@ class BaseDriver(ABC):
                     self._car.set_steering(self._steering_cmd)
                     
                     self._steering_cmd = self._get_steering()
-                    self._log_data()
+                    if self._iteration % 2 == 0:
+                        self._log_data()
                     self._steering_buffer.add(self._steering_cmd)
                     self._iteration += 1        
         finally:
@@ -81,7 +82,7 @@ class BaseDriver(ABC):
         return val - step if val > 0 else val + step
 
     def _set_car_speed(self):
-        ON_SPEED = 0.23 #0.23 is minimum possible that will go forward
+        ON_SPEED = 0.25 #0.23 is minimum possible that will go forward
         self._throttle_cmd = (ON_SPEED if self._iteration//self._THROTTLE_STEP_LEN % self._THROTTLE_CYCLE == 0 else 0.0)
         self._car.set_speed(self._throttle_cmd)
 

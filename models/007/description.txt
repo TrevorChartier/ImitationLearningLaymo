@@ -1,0 +1,3 @@
+This is the policy resulting from 2 DAgger iterations. DAgger data was collected under 006.
+
+Removed gaussian noise augmentation. Upped to 0.5 of original data. Also ran Braden's cleaning on the og data.

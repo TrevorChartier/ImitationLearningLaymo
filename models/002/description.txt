@@ -1,0 +1,43 @@
+Second Model Trained. Still on initial data. Included Some augmentation to data.
+
+This model works decently well for a base model. Some intelligent behavior observed.
+
+Also made some tweaks to architecture/hyperparams.
+
+image_input = keras.Input(shape=(60, 80, 3))
+
+
+x = keras.layers.Conv2D(24, 5, padding='same', use_bias=False)(image_input)
+x = keras.layers.BatchNormalization(center=True, scale=False)(x)
+x = keras.layers.Activation('relu')(x)
+
+
+x = keras.layers.Conv2D(36, 5, strides=2, padding='same', use_bias=False)(x)
+x = keras.layers.BatchNormalization(center=True, scale=False)(x)
+x = keras.layers.Activation('relu')(x)
+
+x = keras.layers.Conv2D(48, 3, strides=2, padding='same', use_bias=False)(x)
+x = keras.layers.BatchNormalization(center=True, scale=False)(x)
+x = keras.layers.Activation('relu')(x)
+
+x = keras.layers.Conv2D(48, 7, strides=7, padding='same', use_bias=False)(x)
+x = keras.layers.BatchNormalization(center=True, scale=False)(x)
+x = keras.layers.Activation('relu')(x)
+
+x = keras.layers.Flatten()(x)
+x = keras.layers.Dropout(0.2)(x)
+
+x = keras.layers.Dense(64)(x)
+x = keras.layers.BatchNormalization(center=True, scale=False)(x)
+x = keras.layers.Activation('relu')(x)
+x = keras.layers.Dropout(0.2)(x)
+
+x = keras.layers.Dense(24)(x)
+x = keras.layers.BatchNormalization(center=True, scale=False)(x)
+x = keras.layers.Activation('relu')(x)
+x = keras.layers.Dropout(0.2)(x)
+
+output = keras.layers.Dense(3, activation='softmax')(x)
+
+
+model = keras.Model(inputs=[image_input], outputs=output)

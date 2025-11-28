@@ -1,0 +1,2 @@
+Very similair to 004. Upped the proportion of the original training data to 0.4 from 0.2 and increased augmentation amount.
+This policy was used to collect  DAgger for 006

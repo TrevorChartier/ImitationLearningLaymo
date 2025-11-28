@@ -1,0 +1,3 @@
+Same  model new data. No DAgger.  Added a new dataset collected at about 6hz and undersampled original.
+
+In  total, trained on around 27k images.  Same augmentation roughly.

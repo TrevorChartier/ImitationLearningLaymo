@@ -34,7 +34,7 @@ class InferenceDriver(BaseDriver):
                 return self._get_keyboard_steering_input(key)
             
         # If nothing is returned already, policy is in control
-        return self._model.predict(self._latest_camera_frame, float(self._throttle_cmd))
+        return self._model.predict(self._latest_camera_frame)
     
     def _log_data(self):
         """Write the current camera frame and steering command."""
