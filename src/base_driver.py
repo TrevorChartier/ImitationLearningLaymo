@@ -29,7 +29,7 @@ class BaseDriver(ABC):
         self._steering_buffer = Buffer(100)
         
         self._THROTTLE_STEP_LEN = 15 # How many iterations in a cycle
-        self._THROTTLE_CYCLE = 4 # How many cycles in period. Throttle is on for one of the cycles in period
+        self._THROTTLE_CYCLE = 3 # How many cycles in period. Throttle is on for one of the cycles in period
         self._THROTTLE_PERIOD = self._THROTTLE_CYCLE * self._THROTTLE_STEP_LEN
         
         expert_dir = os.path.join(data_dir, "expert")
@@ -99,7 +99,8 @@ class BaseDriver(ABC):
         throttle_pulse_idx = self._iteration % self._THROTTLE_PERIOD
         
         img_filename = f"{timestamp}.jpg"
-        cv2.imwrite(os.path.join(output_paths["images"], img_filename), self._latest_camera_frame)
+        if self._iteration % 10 == 0:
+            cv2.imwrite(os.path.join(output_paths["images"], img_filename), self._latest_camera_frame)
         with open(output_paths["labels"], "a", encoding="utf-8") as f:
             f.write(f"{timestamp}\t{steering_lookback_str}\t{throttle_pulse_idx}\t{self._steering_cmd}\n")
     

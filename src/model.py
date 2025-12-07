@@ -19,9 +19,8 @@ class Model:
         self._interpreter.set_tensor(self._input_details[0]['index'], img_input)
         
         self._interpreter.invoke()
-        pred = self._interpreter.get_tensor(self._output_details[0]['index'])[0]
-        print(pred)
-        print(np.argmax(pred))
+        pred = self._interpreter.get_tensor(self._output_details[0]['index'])[0] 
+
         return np.argmax(pred) - 1 # Predictions are [0-2] we need to shift back to steering angles
     
     def get_info(self):
