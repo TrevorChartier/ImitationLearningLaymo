@@ -80,7 +80,7 @@ We used Grad-CAM Saliency Maps to debug the model's decision-making. As seen abo
 ├── src/
 │   ├── autonomous_run.py      # Entry point for autonomous driving using a trained model
 │   ├── rc_data_collection.py  # Entry point for manual expert data collection
-│   ├── inference_driver.py    # Handles autonomoous driving with expert intervention logic
+│   ├── inference_driver.py    # Handles autonomous driving with expert intervention logic
 │   ├── keyboard_driver.py     # Handles manual teleoperation driving logic
 │   ├── base_driver.py         # Abstract base class for the control & logging loop
 │   ├── model.py               # TFLite model wrapper (preprocessing & inference)
