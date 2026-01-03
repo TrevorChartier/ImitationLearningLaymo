@@ -1,7 +1,6 @@
 # End-to-End Behavioral Cloning for Autonomous Driving
 **A deep learning-based autonomous driving system running locally on embedded hardware.**
 
-## Demo
 https://github.com/user-attachments/assets/520368c8-3ce6-4221-9626-adb5e0731a4e
 
 ## Project Overview
@@ -18,6 +17,7 @@ The system addresses two major challenges in embedded robotics:
 ### Key Results 
 
 * **4.5x** increase in autonomous driving distance after a single iteration of Expert Intervention Learning.
+
   <img width="428" height="384" alt="Screenshot 2026-01-02 at 6 33 50 PM" src="https://github.com/user-attachments/assets/2d9834e7-4b65-4b64-90d9-19e9f67a34ef" />
 
 * **9.4x** reduction in model size (665KB → 70KB) using PCQAT optimization.
