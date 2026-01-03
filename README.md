@@ -1,4 +1,4 @@
-# End-to-End Behavioral Cloning for Autonomous RC Steering
+# End-to-End Behavioral Cloning for Autonomous Driving
 **A deep learning-based autonomous driving system running locally on embedded hardware.**
 
 ## Demo
