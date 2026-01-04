@@ -33,7 +33,7 @@ https://github.com/TrevorChartier/LAYMO). Visit this repository for a breakdown 
 
 ### 1.   Behavioral Cloning
 
-We utilized behavioral cloning to imitate the driving habits of a human expert. The process involvs three steps:
+We utilized behavioral cloning to imitate the driving habits of a human expert. The process involves three steps:
 
 1. **Data Collection**: A human expert teleoperated the car around the track, collecting a dataset of camera images paired with steering commands (state-action pairs).
 3. **Training**: A CNN was trained to map these raw input images to the correct steering prediction.
