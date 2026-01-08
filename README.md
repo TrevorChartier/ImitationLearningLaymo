@@ -26,7 +26,7 @@ The system addresses two major challenges in embedded robotics:
 
 ## Hardware Platform
 
-This project builds on my [LAYMO Repository](
+This project builds on a previous project — [LAYMO](
 https://github.com/TrevorChartier/LAYMO). Visit this repository for a breakdown of the physical build, wiring diagrams, and the initial PID control implementation.
 
 ## Methodology
